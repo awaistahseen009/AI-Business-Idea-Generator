@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AI Business Idea Generator{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded-3 p-4">
+                <h1 class="h3 mb-2">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Welcome back, {{ display_name or user_email }}!
+                </h1>
+                <p class="mb-0">Ready to generate your next breakthrough business idea?</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-magic fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Generate New Ideas</h5>
+                    <p class="card-text text-muted">Create fresh startup concepts for any niche or industry</p>
+                    <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Generate Ideas
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-history fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">View History</h5>
+                    <p class="card-text text-muted">Browse all your previously generated business ideas</p>
+                    <a href="{{ url_for('ideas.history') }}" class="btn btn-success">
+                        <i class="fas fa-list me-1"></i>View History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Ideas -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-clock me-2"></i>Recent Ideas
+            </h3>
+            
+            {% if previous_ideas %}
+                <div class="row">
+                    {% for business_idea in previous_ideas[:3] %}
+                        <div class="col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0 text-primary fw-bold">{{ business_idea.niche }}</h6>
+                                        {% if business_idea.web_search_used %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-search me-1"></i>Web Enhanced
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ business_idea.created_at[:10] if business_idea.created_at else 'Unknown' }}
+                                    </small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <strong class="text-success">{{ business_idea.ideas[0].name if business_idea.ideas else 'No ideas' }}</strong>
+                                    </div>
+                                    <p class="card-text text-muted small">
+                                        {{ (business_idea.ideas[0].pitch[:100] + '...') if business_idea.ideas and business_idea.ideas[0].pitch else 'No description available' }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-lightbulb me-1"></i>
+                                            {{ business_idea.ideas|length if business_idea.ideas else 0 }} ideas
+                                        </small>
+                                        <a href="{{ url_for('ideas.view_idea', idea_id=business_idea.id) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                {% if previous_ideas|length > 3 %}
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('ideas.history') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-1"></i>View All Ideas
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-lightbulb fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No ideas generated yet</h5>
+                        <p class="text-muted">Start by generating your first set of business ideas!</p>
+                        <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary">
+                            <i class="fas fa-magic me-1"></i>Generate Your First Ideas
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    {% if previous_ideas %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar me-2"></i>Your Stats
+                    </h5>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <h3 class="text-primary">{{ previous_ideas|length }}</h3>
+                                <p class="text-muted mb-0">Total Sessions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <h3 class="text-success">{{ (previous_ideas|length * 3) }}</h3>
+                                <p class="text-muted mb-0">Ideas Generated</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <h3 class="text-info">{{ previous_ideas|selectattr('web_search_used')|list|length }}</h3>
+                                <p class="text-muted mb-0">Web Enhanced</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <h3 class="text-warning">{{ previous_ideas|map(attribute='niche')|unique|list|length }}</h3>
+                                <p class="text-muted mb-0">Unique Niches</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.stat-item {
+    padding: 1rem 0;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,16 @@
+Flask
+Flask-WTF
+python-dotenv
+supabase
+langchain
+langchain-google-genai
+langgraph
+pydantic
+requests
+Werkzeug
+psycopg2-binary
+langchain-community
+tavily-python
+uvicorn
+asgiref
+langchain-openai

@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}View Ideas - AI Business Idea Generator{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold text-primary">
+                        <i class="fas fa-eye me-2"></i>Business Ideas
+                    </h1>
+                    <p class="text-muted">
+                        Generated for: <strong>{{ business_idea.niche }}</strong>
+                        <span class="text-muted ms-2">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ business_idea.created_at[:10] if business_idea.created_at else 'Unknown' }}
+                        </span>
+                    </p>
+                </div>
+                <div>
+                    {% if business_idea.web_search_used %}
+                        <span class="badge bg-info me-2">
+                            <i class="fas fa-search me-1"></i>Web Enhanced
+                        </span>
+                    {% endif %}
+                    <a href="{{ url_for('ideas.history') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ideas Display -->
+    {% if business_idea.ideas %}
+        <div class="row">
+            {% for idea in business_idea.ideas %}
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm idea-card">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-rocket me-2"></i>{{ idea.name }}
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h6 class="text-primary fw-bold">
+                                <i class="fas fa-bullhorn me-1"></i>Business Pitch
+                            </h6>
+                            <p class="card-text">{{ idea.pitch }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="text-success fw-bold">
+                                <i class="fas fa-users me-1"></i>Target Audience
+                            </h6>
+                            <p class="card-text">{{ idea.audience }}</p>
+                        </div>
+                        
+                        <div class="mb-0">
+                            <h6 class="text-warning fw-bold">
+                                <i class="fas fa-dollar-sign me-1"></i>Revenue Model
+                            </h6>
+                            <p class="card-text">{{ idea.revenue_model }}</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="text-center">
+                            <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard('{{ loop.index }}')">
+                                <i class="fas fa-copy me-1"></i>Copy Details
+                            </button>
+                        </div>
+                        <!-- Hidden content for copying -->
+                        <div id="copy-content-{{ loop.index }}" style="display: none;">
+Startup Name: {{ idea.name }}
+
+Pitch: {{ idea.pitch }}
+
+Target Audience: {{ idea.audience }}
+
+Revenue Model: {{ idea.revenue_model }}
+
+Generated for niche: {{ business_idea.niche }}
+Date: {{ business_idea.created_at[:10] if business_idea.created_at else 'Unknown' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary">
+                        <i class="fas fa-magic me-1"></i>Generate More Ideas
+                    </a>
+                    <a href="{{ url_for('ideas.dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('ideas.history') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-history me-1"></i>View History
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generation Info -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-info-circle me-2 text-info"></i>Generation Details
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Niche:</strong><br>
+                                <span class="text-muted">{{ business_idea.niche }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Ideas Generated:</strong><br>
+                                <span class="text-muted">{{ business_idea.ideas|length }}</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Web Search:</strong><br>
+                                <span class="text-muted">
+                                    {% if business_idea.web_search_used %}
+                                        <i class="fas fa-check text-success"></i> Enabled
+                                    {% else %}
+                                        <i class="fas fa-times text-danger"></i> Disabled
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Generated On:</strong><br>
+                                <span class="text-muted">{{ business_idea.created_at[:10] if business_idea.created_at else 'Unknown' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- No Ideas Available -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                        <h4 class="text-muted">No Ideas Available</h4>
+                        <p class="text-muted">This session doesn't contain any generated ideas.</p>
+                        <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Generate New Ideas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.idea-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.idea-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-header h4 {
+    font-size: 1.1rem;
+}
+
+.btn-group .btn {
+    margin: 0 2px;
+}
+
+@media (max-width: 768px) {
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin: 2px 0;
+    }
+}
+</style>
+
+<script>
+function copyToClipboard(ideaIndex) {
+    const content = document.getElementById('copy-content-' + ideaIndex).textContent;
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(content).then(function() {
+            showToast('Idea details copied to clipboard!', 'success');
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+            fallbackCopyTextToClipboard(content);
+        });
+    } else {
+        fallbackCopyTextToClipboard(content);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showToast('Idea details copied to clipboard!', 'success');
+        } else {
+            showToast('Failed to copy to clipboard', 'error');
+        }
+    } catch (err) {
+        console.error('Fallback: Could not copy text: ', err);
+        showToast('Failed to copy to clipboard', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showToast(message, type) {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    toast.style.top = '20px';
+    toast.style.right = '20px';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

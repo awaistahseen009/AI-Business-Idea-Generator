@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Ideas History - AI Business Idea Generator{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 fw-bold text-primary">
+                        <i class="fas fa-history me-2"></i>Ideas History
+                    </h1>
+                    <p class="text-muted">Browse all your previously generated business ideas</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Generate New Ideas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ideas List -->
+    {% if ideas %}
+        <div class="row">
+            {% for business_idea in ideas %}
+            <div class="col-12 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h5 class="mb-0 text-primary fw-bold">
+                                    <i class="fas fa-bullseye me-2"></i>{{ business_idea.niche }}
+                                </h5>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <div class="d-flex flex-wrap justify-content-md-end gap-2 mt-2 mt-md-0">
+                                    {% if business_idea.web_search_used %}
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-search me-1"></i>Web Enhanced
+                                        </span>
+                                    {% endif %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ business_idea.created_at[:10] if business_idea.created_at else 'Unknown' }}
+                                    </span>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        {{ business_idea.ideas|length if business_idea.ideas else 0 }} Ideas
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if business_idea.ideas %}
+                            <div class="row">
+                                {% for idea in business_idea.ideas %}
+                                <div class="col-lg-4 mb-3">
+                                    <div class="border rounded p-3 h-100">
+                                        <h6 class="text-success fw-bold mb-2">
+                                            <i class="fas fa-rocket me-1"></i>{{ idea.name }}
+                                        </h6>
+                                        <p class="text-muted small mb-2">
+                                            {{ (idea.pitch[:120] + '...') if idea.pitch|length > 120 else idea.pitch }}
+                                        </p>
+                                        <div class="small text-muted">
+                                            <div class="mb-1">
+                                                <strong>Audience:</strong> {{ (idea.audience[:50] + '...') if idea.audience|length > 50 else idea.audience }}
+                                            </div>
+                                            <div>
+                                                <strong>Revenue:</strong> {{ (idea.revenue_model[:50] + '...') if idea.revenue_model|length > 50 else idea.revenue_model }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted mb-0">No ideas available for this session.</p>
+                        {% endif %}
+                        
+                        <div class="text-end mt-3">
+                            <a href="{{ url_for('ideas.view_idea', idea_id=business_idea.id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="Ideas pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('ideas.history', page=page-1) }}">
+                                    <i class="fas fa-chevron-left me-1"></i>Previous
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    <i class="fas fa-chevron-left me-1"></i>Previous
+                                </span>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">Page {{ page }}</span>
+                        </li>
+
+                        {% if has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('ideas.history', page=page+1) }}">
+                                    Next<i class="fas fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Next<i class="fas fa-chevron-right ms-1"></i>
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-history fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Ideas Generated Yet</h4>
+                        <p class="text-muted">You haven't generated any business ideas yet. Start creating your first set of ideas!</p>
+                        <a href="{{ url_for('ideas.generate') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic me-2"></i>Generate Your First Ideas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.pagination .page-link {
+    color: #667eea;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.pagination .page-link:hover {
+    color: #5a6fd8;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+</style>
+{% endblock %}

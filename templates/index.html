@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}AI Business Idea Generator - Home{% endblock %}
+
+{% block content %}
+<div class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-lightbulb text-warning me-3"></i>
+                    AI Business Idea Generator
+                </h1>
+                <p class="lead mb-4">
+                    Transform your industry knowledge into innovative startup ideas with the power of AI. 
+                    Get personalized business concepts, target audiences, and revenue models in seconds.
+                </p>
+                <div class="d-grid gap-2 d-md-flex">
+                    {% if not session.user_id %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg me-md-2">
+                            <i class="fas fa-rocket me-2"></i>Get Started Free
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('ideas.generate') }}" class="btn btn-warning btn-lg me-md-2">
+                            <i class="fas fa-magic me-2"></i>Generate Ideas
+                        </a>
+                        <a href="{{ url_for('ideas.dashboard') }}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-brain fa-10x text-warning opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold">How It Works</h2>
+            <p class="text-muted">Simple, fast, and powered by advanced AI</p>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-edit fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">1. Enter Your Niche</h5>
+                    <p class="card-text text-muted">
+                        Simply type in any industry or niche you're interested in exploring for business opportunities.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-search fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">2. AI Analysis</h5>
+                    <p class="card-text text-muted">
+                        Our AI analyzes market trends and opportunities, optionally enhanced with real-time web research.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-lightbulb fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">3. Get Ideas</h5>
+                    <p class="card-text text-muted">
+                        Receive 3 unique startup ideas with detailed pitches, target audiences, and revenue models.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row bg-light rounded-3 p-5 mb-5">
+        <div class="col-lg-6">
+            <h3 class="fw-bold mb-4">Why Choose Our AI Generator?</h3>
+            <ul class="list-unstyled">
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Instant Results:</strong> Generate ideas in seconds, not hours
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Market Research:</strong> Optional web search for current trends
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Complete Package:</strong> Ideas with pitches, audiences, and revenue models
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>History Tracking:</strong> Save and revisit all your generated ideas
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <strong>Free to Use:</strong> No hidden costs or subscription fees
+                </li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <div class="text-center">
+                <i class="fas fa-chart-line fa-8x text-primary opacity-50"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    {% if not session.user_id %}
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="bg-primary text-white rounded-3 p-5">
+                <h3 class="fw-bold mb-3">Ready to Discover Your Next Big Idea?</h3>
+                <p class="lead mb-4">Join thousands of entrepreneurs who have found their inspiration with AI</p>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-warning btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Start Generating Ideas Now
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.feature-icon {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

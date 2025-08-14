@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Ideas - AI Business Idea Generator{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="fas fa-magic me-2"></i>Generate Business Ideas
+                </h1>
+                <p class="lead text-muted">Enter a niche and let AI create innovative startup concepts for you</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generation Form -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-4">
+                            <label for="niche" class="form-label h5">
+                                <i class="fas fa-bullseye me-2 text-primary"></i>Industry or Niche
+                            </label>
+                            <textarea class="form-control form-control-lg" id="niche" name="niche" 
+                                    rows="3" placeholder="e.g., sustainable fashion, AI-powered healthcare, remote work tools, fintech for small businesses..." 
+                                    required minlength="3">{{ niche if niche else '' }}</textarea>
+                            <div class="form-text">Be specific about the industry, target market, or problem area you're interested in.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="web_search" name="web_search" 
+                                       {% if web_search_used %}checked{% endif %}>
+                                <label class="form-check-label h6" for="web_search">
+                                    <i class="fas fa-search me-2 text-info"></i>
+                                    Enable Web Search Enhancement
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                When enabled, AI will research current market trends to enhance idea generation.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                <i class="fas fa-magic me-2"></i>Generate Ideas
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Ideas -->
+    {% if generated_ideas %}
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-success">
+                    <i class="fas fa-lightbulb me-2"></i>Your Generated Ideas
+                </h2>
+                <p class="text-muted">
+                    Generated for: <strong>{{ niche }}</strong>
+                    {% if web_search_used %}
+                        <span class="badge bg-info ms-2">
+                            <i class="fas fa-search me-1"></i>Web Enhanced
+                        </span>
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="row">
+                {% for idea in generated_ideas %}
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm idea-card">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-rocket me-2"></i>{{ idea.name }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-bullhorn me-1"></i>Pitch
+                                </h6>
+                                <p class="card-text">{{ idea.pitch }}</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-success">
+                                    <i class="fas fa-users me-1"></i>Target Audience
+                                </h6>
+                                <p class="card-text text-muted">{{ idea.audience }}</p>
+                            </div>
+                            
+                            <div class="mb-0">
+                                <h6 class="text-warning">
+                                    <i class="fas fa-dollar-sign me-1"></i>Revenue Model
+                                </h6>
+                                <p class="card-text text-muted">{{ idea.revenue_model }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pt-0 pb-3 text-end">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-secondary copy-idea-btn"
+                                    data-idea-content="{{ (
+                                        'Name: ' ~ idea.name ~ '\n' ~
+                                        'Pitch: ' ~ idea.pitch ~ '\n' ~
+                                        'Audience: ' ~ idea.audience ~ '\n' ~
+                                        'Revenue Model: ' ~ idea.revenue_model
+                                    ) | e }}">
+                                <i class="fas fa-copy me-1"></i>Copy Idea
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-outline-secondary me-2" id="copyAllIdeas">
+                    <i class="fas fa-copy me-1"></i>Copy All Ideas
+                </button>
+                <a href="{{ url_for('ideas.generate') }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-redo me-1"></i>Generate More Ideas
+                </a>
+                <a href="{{ url_for('ideas.dashboard') }}" class="btn btn-success">
+                    <i class="fas fa-tachometer-alt me-1"></i>Back to Dashboard
+                </a>
+            </div>
+
+            {% if web_search_used and sources and sources|length > 0 %}
+            <div class="mt-5">
+                <h5 class="mb-3"><i class="fas fa-link me-2"></i>Sources</h5>
+                <ul class="list-unstyled">
+                    {% for s in sources %}
+                    <li class="mb-2">
+                        <i class="fas fa-external-link-alt me-2"></i>
+                        <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tips Section -->
+    {% if not generated_ideas %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-4">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>Tips for Better Results
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Be specific about your target market
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Mention current trends or technologies
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Include the problem you want to solve
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Enable web search for trending insights
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Try different variations of your niche
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Combine multiple interests or industries
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.idea-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.idea-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+#generateBtn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+#generateBtn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const generateBtn = document.getElementById('generateBtn');
+    const originalText = generateBtn.innerHTML;
+    
+    form.addEventListener('submit', function() {
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating Ideas...';
+    });
+});
+</script>
+{% endblock %}

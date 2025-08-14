@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+.venv/
+venv/
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local artifacts
+uploads/
+.idea/
+.vscode/
+*.log
